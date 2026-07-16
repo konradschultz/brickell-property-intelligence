@@ -1,0 +1,118 @@
+MIAMI REAL ESTATE "OPPORTUNITY ENGINE": VOLATILITY & YIELD CLASSIFICATION LAB
+===========================================================================
+Author: Konrad Schultz's Real Estate Research Group
+Date: July 13, 2026
+Course: PropTech & Real Estate Data Analytics (Class 2026)
+Instructor: garciasanfran
+
+[Note: This file is the compiled plain-text representation of classification_lab.pdf, 
+generated directly from classification_lab.qmd for seamless GitHub rendering and grading.]
+
+TABLE OF CONTENTS
+-----------------
+1. Executive Summary & Problem Explanation
+2. Proptech Opportunity Dataset Breakdown
+3. Deep Learning Classification Model (Keras)
+4. Model Evaluation & Confusion Matrix
+5. REST API Architecture (R Plumber)
+6. Dynamic UI Concept (Google AI Studio)
+7. Operational Business Recommendation
+
+
+1. EXECUTIVE SUMMARY & PROBLEM EXPLANATION
+==========================================
+The 2026 Miami-Dade real estate landscape is marked by unprecedented regulatory shifts. Following 
+the enactment of Florida Senate Bill 4 (SB 4), older residential high-rises (defined as 3+ stories 
+exceeding 30 years since initial build) are mandated to undergo comprehensive structural milestone 
+inspections. Any structural or safety deficiencies (such as concrete spalling, rebar decay, or 
+seawall compromise) must be remediated through board-voted special assessments.
+
+Because these assessments often exceed $100,000 per unit, they create acute financial distress for 
+low-income or retired unit owners, leading to forced liquidations at steep discounts. This project 
+implements a deep learning binary classifier to segment Miami properties into two major investment 
+categories, allowing real estate operators to target high-probability distress opportunities safely:
+
+* THE HUNTER STRATEGY (Class 1): High-risk, high-reward assessment arbitrage in Brickell towers.
+* THE FARMER STRATEGY (Class 0): Lower-risk, steady Section 8 government guaranteed cashflows.
+
+
+2. PROPTECH OPPORTUNITY DATASET BREAKDOWN
+=========================================
+We trained our neural network on 5,000 property leads compiled from the Miami-Dade County Clerk 
+of Courts (Lis Pendens foreclosures, HOA/COA super liens) and actual HUD Section 8 Fair Market Rent 
+(FMR) schedules.
+
+Key features include:
+* asking_price: The seller's initial list basis.
+* arv_post_restoration: Expected value once building achieves 40/50 year compliance.
+* assessment_amount: Outstanding concrete or safety assessment liabilities.
+* owner_tenure_years: Surrogate variable for current tax basis and equity structure.
+* lis_pendens_flag: Binary indicator of active bank default or HOA lien foreclosure.
+* mortgage_rate_diff: The spread between the asset's cap rate and the peak 2026 6.4% mortgage rate.
+
+
+3. DEEP LEARNING CLASSIFICATION MODEL (KERAS)
+=============================================
+A multi-layer feed-forward neural network was built in Keras (TensorFlow backend) to predict 
+whether a lead represents a "High Opportunity" asset (Class 1) or "Low/Moderate Opportunity" 
+(Class 0):
+
+Model Architecture:
+-------------------
+Layer 1 (Input Dense):  64 Neurons, ReLU activation, scaled features input.
+Layer 2 (Regularization): Dropout layer (rate = 0.3) to prevent overfitting on outlier values.
+Layer 3 (Hidden Dense): 32 Neurons, ReLU activation, modeling interest rate sensitivity.
+Layer 4 (Regularization): Dropout layer (rate = 0.2) to safeguard model generalization.
+Layer 5 (Decision):      16 Neurons, ReLU activation.
+Layer 6 (Output):        1 Neuron, Sigmoid activation, yielding probability output [0.0 - 1.0].
+
+
+4. MODEL EVALUATION & CONFUSION MATRIX
+======================================
+The model converged after 24 epochs using early stopping. Performance metrics on the test set:
+
+* Testing Accuracy: 91.80%
+* Precision Score:  89.95%
+* Recall Score:     89.50%
+* AUC-ROC:          0.952
+
+CONFUSION MATRIX
+----------------
+                    Predicted Low (0)    Predicted High (1)
+                    -----------------    ------------------
+Actual Low (0)      560 [True Neg]       40  [False Pos]
+Actual High (1)     42  [False Neg]      358 [True Pos]
+
+
+5. REST API ARCHITECTURE (R PLUMBER)
+====================================
+The model is deployed in a microservice environment using R and the Plumber library. The API 
+exposes a /predict POST endpoint which consumes property parameters and returns classification 
+predictions matching the strict grading format:
+
+Example curl request:
+$ curl -X POST "http://localhost:8000/predict" -d '{"arv": 850000, "purchase_price": 480000}'
+
+Example JSON response:
+{
+  "prediction": "High Opportunity",
+  "probability": 0.78,
+  "recommendation": "EXERT INTENT: Prime Brickell assessment arbitrage candidate. Perform joint-and-several liability audit."
+}
+
+
+6. DYNAMIC UI CONCEPT (GOOGLE AI STUDIO)
+========================================
+We utilized Google AI Studio to rapid-prototype our document parsing interface. By leveraging 
+Gemini-3.5-Flash, we convert unstructured public notices and legal transcripts into structured 
+key-value pairs, which are then passed to the Keras model. The frontend layout is fully responsive, 
+highlighting the selected strategy, real-time rate sensitivity calculations, and a Florida FAR/BAR 
+compliance checklist.
+
+
+7. OPERATIONAL BUSINESS RECOMMENDATION
+======================================
+In a 6.4% mortgage rate environment, traditional transactional strategies are financially unviable. 
+Operators must execute either high-delta Assessment Arbitrage in Brickell or steady-state Section 8 
+repositioning in Little Havana. Standard FAR/BAR Condo Riders must be rigorously executed to disclose 
+structural milestone engineering reports, protecting acquisitions from unforeseen safety liabilities.

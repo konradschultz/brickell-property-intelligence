@@ -1,0 +1,6 @@
+{
+  "name": "Brickell Property Intelligence",
+  "description": "Data-driven condo investment analysis for Miami-Dade, built by a licensed Florida real estate professional.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
